@@ -10,4 +10,8 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /api/nodes                  controllers.NodeController.nodes
 
 # Notify a node change
-PUT     /api/nodes/:id               controllers.NodeController.notifyChange(id: Int)
+PUT     /api/nodes/:id              controllers.NodeController.notifyChange(id: Int)
+
+# DEBUG CALL
+# Add or update node
+PUT     /api/nodes                  controllers.NodeController.addNode
