@@ -17,12 +17,20 @@ class NodeController @Inject()(nodeService: NodeService, communicationService: C
       Logger.info("Creating or updating node " + audioNode.id)
       nodeService.save(audioNode)
     })
-    Ok
+    Ok.withHeaders(
+      ACCESS_CONTROL_ALLOW_ORIGIN -> "*",
+      ACCESS_CONTROL_ALLOW_HEADERS -> "*",
+      ACCESS_CONTROL_ALLOW_METHODS -> "GET"
+    )
   }
 
   def nodes() = Action { implicit request: Request[AnyContent] =>
     def nodeList = nodeService.list
-    Ok(Json.toJson(nodeList))
+    Ok(Json.toJson(nodeList)).withHeaders(
+      ACCESS_CONTROL_ALLOW_ORIGIN -> "*",
+      ACCESS_CONTROL_ALLOW_HEADERS -> "*",
+      ACCESS_CONTROL_ALLOW_METHODS -> "PUT"
+    )
   }
 
   def notifyChange(id: Int) = Action { implicit request: Request[AnyContent] =>
