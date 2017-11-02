@@ -8,49 +8,45 @@ import play.api.mvc._
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.libs.json._
 import services.node.NodeService
+import services.communication.CommunicationService
 
 @Singleton
-class NodeController @Inject()(nodeService: NodeService) extends InjectedController() {
+class NodeController @Inject()(nodeService: NodeService, communicationService: CommunicationService) extends InjectedController() {
   def addNode() = Action { implicit request: Request[AnyContent] =>
-    val json = request.body.asJson.get
-    implicit val audioNodeReads = Json.reads[AudioNode]
-    val resultObject: JsResult[AudioNode] = Json.fromJson[AudioNode](json)
-
-    resultObject match {
-      case c: JsSuccess[AudioNode] => {
-        val audioNode: AudioNode = c.get
-          Logger.info("Creating or updating node " + audioNode.id)
-          nodeService.save(audioNode)
-      }
-      case e: JsError => {
-        Logger.info("Error parsing AudioNode json.")
-        Logger.info(e.toString)
-      }
-    }
+    parseRequest(request, (audioNode: AudioNode) => {
+      Logger.info("Creating or updating node " + audioNode.id)
+      nodeService.save(audioNode)
+    })
     Ok
   }
 
   def nodes() = Action { implicit request: Request[AnyContent] =>
     def nodeList = nodeService.list
-    implicit val nodeWrites = Json.writes[AudioNode]
     Ok(Json.toJson(nodeList))
   }
 
   def notifyChange(id: Int) = Action { implicit request: Request[AnyContent] =>
+    parseRequest(request, (notifyChangeModel: NotifyChangeModel) => {
+      Logger.info("Sending update to node " + id)
+      // Todo: modify the call so it makes sense
+      communicationService.send(id)
+    })
+    Ok
+  }
+
+  def parseRequest[A](request: Request[AnyContent], callback: (A) => Unit )(implicit reqReads: Reads[A]): Unit ={
     val json = request.body.asJson.get
-    implicit val notifyChangeModelReads = Json.reads[NotifyChangeModel]
-    val resultObject: JsResult[NotifyChangeModel] = Json.fromJson[NotifyChangeModel](json)
+    val resultObject: JsResult[A] = Json.fromJson[A](json)
 
     resultObject match {
-      case c: JsSuccess[NotifyChangeModel] => {
-        val notifyChangeModel: NotifyChangeModel = c.get
-        Logger.info("Sending update to node " + id)
+      case c: JsSuccess[A] => {
+        val obj: A = c.get
+        callback(obj)
       }
       case e: JsError => {
-        Logger.info("Error parsing notifyChangeModel.")
+        Logger.info("Error parsing json.")
         Logger.info(e.toString)
       }
     }
-    Ok
   }
 }
