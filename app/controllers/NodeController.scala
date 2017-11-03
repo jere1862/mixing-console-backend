@@ -37,7 +37,7 @@ class NodeController @Inject()(nodeService: NodeService, communicationService: C
     parseRequest(request, (notifyChangeModel: NotifyChangeModel) => {
       Logger.info("Sending update to node " + id)
       // Todo: modify the call so it makes sense
-      communicationService.send(id)
+      communicationService.send(id.toString)
     })
     Ok
   }
