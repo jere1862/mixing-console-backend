@@ -15,7 +15,7 @@ print("Binding connection to port 3000")
 
 while True:
     data, addr = sock.recvfrom(1024)  #buffer size 
-    for i in range (0, 4):
+    for i in range (0, len(data)):
         print(data[i])
     
     
