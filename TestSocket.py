@@ -15,7 +15,8 @@ print("Binding connection to port 3000")
 
 while True:
     data, addr = sock.recvfrom(1024)  #buffer size 
-    print("Received message: ", data)
+    for i in range (0, 4):
+        print(data[i])
     
     
 #sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))

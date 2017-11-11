@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import models.{AudioNode, NotifyChangeModel}
+import models.{AudioNode, NotifyNodeSoundChangeModel}
 import play.api._
 import play.api.mvc._
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -34,10 +34,8 @@ class NodeController @Inject()(nodeService: NodeService, communicationService: C
   }
 
   def notifyChange(id: Int) = Action { implicit request: Request[AnyContent] =>
-    parseRequest(request, (notifyChangeModel: NotifyChangeModel) => {
-      Logger.info("Sending update to node " + id)
-      // Todo: modify the call so it makes sense
-      communicationService.send(id.toString)
+    parseRequest(request, (notifyChangeModel: NotifyNodeSoundChangeModel) => {
+      communicationService.notifyNodeSoundChange(id, notifyChangeModel)
     })
     Ok
   }
