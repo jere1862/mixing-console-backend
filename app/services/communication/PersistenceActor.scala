@@ -1,7 +1,7 @@
 package services.communication
 
 import akka.actor.{Actor, Props}
-import models.{AudioNode, DataModel, GpsDataModel, MicrophoneDataModel}
+import models._
 import services.node.NodeService
 
 class PersistenceActor(nodeService: NodeService) extends Actor{
@@ -23,10 +23,16 @@ class PersistenceActor(nodeService: NodeService) extends Actor{
       case gpsData: GpsDataModel =>
         node.copy(latitude = gpsData.latitude,
           longitude = gpsData.longitude, gpsDataSet = true)
-
       case micData: MicrophoneDataModel =>
         node.copy(volume = micData.volume, low = micData.low,
-          med = micData.med, high = micData.high, micDataSet = true)
+          med = micData.med, high = micData.high, micDataSet = true,
+          isAdjustedAutomatically = false)
+      case micData: MicrophoneWithSlidersDataModel =>
+        node.copy(volumeSlider = micData.volumeSlider, lowSlider = micData.lowSlider,
+          medSlider = micData.medSlider, highSlider = micData.highSlider,
+          volume = micData.volume, low = micData.low,
+          med = micData.med, high = micData.high, micDataSet = true,
+          isAdjustedAutomatically = true)
     }
   }
 }

@@ -4,14 +4,17 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)
 
 # Return a list of nodes
-GET     /api/nodes                  controllers.NodeController.nodes
+GET     /api/nodes                      controllers.NodeController.nodes
 
 # Notify a node change
-PUT     /api/nodes/:id              controllers.NodeController.notifyChange(id: Int)
+PUT     /api/nodes/change               controllers.NodeController.notifyChange
+
+# Notify automatic adjustment
+PUT     /api/nodes/automaticAdjustment  controllers.NodeController.notifyAutomaticAdjustment
 
 # DEBUG CALL
 # Add or update node
-PUT     /api/nodes                  controllers.NodeController.addNode
+PUT     /api/nodes                      controllers.NodeController.addNode

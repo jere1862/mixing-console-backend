@@ -20,4 +20,3 @@ while True:
     
     
 #sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-  

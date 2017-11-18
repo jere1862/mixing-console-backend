@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import models.{AudioNode, NotifyNodeSoundChangeModel}
+import models.{AudioNode, NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel}
 import play.api._
 import play.api.mvc._
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -33,9 +33,16 @@ class NodeController @Inject()(nodeService: NodeService, communicationService: C
     )
   }
 
-  def notifyChange(id: Int) = Action { implicit request: Request[AnyContent] =>
+  def notifyChange() = Action { implicit request: Request[AnyContent] =>
     parseRequest(request, (notifyChangeModel: NotifyNodeSoundChangeModel) => {
-      communicationService.notifyNodeSoundChange(id, notifyChangeModel)
+      communicationService.notifyNodeSoundChange(notifyChangeModel)
+    })
+    Ok
+  }
+
+  def notifyAutomaticAdjustment() = Action { implicit request: Request[AnyContent] =>
+    parseRequest(request, (notifyAutomaticAdjustmentModel: NotifyAutomaticAdjustmentModel) => {
+      communicationService.notifyAutomaticAdjustment(notifyAutomaticAdjustmentModel)
     })
     Ok
   }

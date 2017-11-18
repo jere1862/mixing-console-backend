@@ -1,10 +1,10 @@
 package services.communication
 
 import com.google.inject.ImplementedBy
-import models.NotifyNodeSoundChangeModel
+import models.{NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel}
 
 @ImplementedBy(classOf[UDPCommunicationService])
 trait CommunicationService {
-  def notifyNodeSoundChange(id: Int, notifyNodeSoundChangeModel: NotifyNodeSoundChangeModel): Unit
-  def notifyAutomaticAdjustment(adjustAutomatically: Boolean): Unit
+  def notifyNodeSoundChange(notifyNodeSoundChangeModel: NotifyNodeSoundChangeModel): Unit
+  def notifyAutomaticAdjustment(notifyAutomaticAdjustmentModel: NotifyAutomaticAdjustmentModel): Unit
 }

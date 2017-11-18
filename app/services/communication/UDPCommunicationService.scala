@@ -3,7 +3,7 @@ package services.communication
 import javax.inject.Inject
 
 import akka.actor.{ActorSystem, Props}
-import models.NotifyNodeSoundChangeModel
+import models.{NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel}
 import services.node.NodeService
 
 class UDPCommunicationService @Inject()(nodeService: NodeService) extends CommunicationService {
@@ -13,12 +13,11 @@ class UDPCommunicationService @Inject()(nodeService: NodeService) extends Commun
   val udpReceiver = system.actorOf(UDPReceivingActor.props(persistenceActor), "UdpReceiver")
   val encodingActor = system.actorOf(EncodingActor.props(udpSender))
 
-   def notifyNodeSoundChange(id: Int, notifyNodeSoundChangeModel: NotifyNodeSoundChangeModel): Unit = {
-     val notifyModel = notifyNodeSoundChangeModel.copy(id = id)
-     encodingActor ! notifyModel
+   def notifyNodeSoundChange(notifyNodeSoundChangeModel: NotifyNodeSoundChangeModel): Unit = {
+     encodingActor ! notifyNodeSoundChangeModel
    }
 
-   def notifyAutomaticAdjustment(adjustAutomatically: Boolean): Unit = {
-     
+   def notifyAutomaticAdjustment(notifyAutomaticAdjustmentModel: NotifyAutomaticAdjustmentModel): Unit = {
+     encodingActor ! notifyAutomaticAdjustmentModel
    }
 }

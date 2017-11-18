@@ -19,7 +19,7 @@ class UDPReceivingActor(persistenceActor: ActorRef) extends Actor{
 
   def ready(socket: ActorRef): Receive = {
     case Udp.Received(data, remote) =>
-      val child = context.actorOf(ParsingActor.props(persistenceActor))
+      val child = context.actorOf(DecodingActor.props(persistenceActor))
       child ! data.asByteBuffer
       socket ! Udp.Send(ByteString("Message received!"), remote) // Echo back
     case Udp.Unbind => socket ! Udp.Unbind
