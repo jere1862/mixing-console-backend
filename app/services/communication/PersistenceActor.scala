@@ -24,14 +24,14 @@ class PersistenceActor(nodeService: NodeService) extends Actor{
         node.copy(latitude = gpsData.latitude,
           longitude = gpsData.longitude, gpsDataSet = true)
       case micData: MicrophoneDataModel =>
-        node.copy(volume = micData.volume, low = micData.low,
-          med = micData.med, high = micData.high, micDataSet = true,
+        node.copy(volume = micData.volume.toInt, low = micData.low.toInt,
+          med = micData.med.toInt, high = micData.high.toInt, micDataSet = true,
           isAdjustedAutomatically = false)
       case micData: MicrophoneWithSlidersDataModel =>
-        node.copy(volumeSlider = micData.volumeSlider, lowSlider = micData.lowSlider,
-          medSlider = micData.medSlider, highSlider = micData.highSlider,
-          volume = micData.volume, low = micData.low,
-          med = micData.med, high = micData.high, micDataSet = true,
+        node.copy(volumeSlider = micData.volumeSlider.toInt, lowSlider = micData.lowSlider.toInt,
+          medSlider = micData.medSlider.toInt, highSlider = micData.highSlider.toInt,
+          volume = micData.volume.toInt, low = micData.low.toInt,
+          med = micData.med.toInt, high = micData.high.toInt, micDataSet = true,
           isAdjustedAutomatically = true)
     }
   }

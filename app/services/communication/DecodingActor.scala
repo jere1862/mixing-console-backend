@@ -54,15 +54,16 @@ class DecodingActor(persistenceActor: ActorRef) extends Actor{
   def parseMicrophoneMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneDataModel = {
     println("Received microphone data")
 
-    new MicrophoneDataModel(byteBuffer.get, (flags & BitMaskFixFlag) == 1,
-      byteBuffer.get, byteBuffer.get, byteBuffer.get, byteBuffer.get)
+    new MicrophoneDataModel(byteBuffer.get & 0xFF, (flags & BitMaskFixFlag) == 1,
+      byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF)
   }
 
   def parseMicrophoneWithSlidersMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneWithSlidersDataModel = {
     println("Received microphone and sliders data")
 
-    new MicrophoneWithSlidersDataModel(byteBuffer.get, (flags & 1) == 1, byteBuffer.get, byteBuffer.get,
-      byteBuffer.get, byteBuffer.get, byteBuffer.get, byteBuffer.get, byteBuffer.get, byteBuffer.get)
+    new MicrophoneWithSlidersDataModel(byteBuffer.get & 0xFF, (flags & 1) == 1, byteBuffer.get & 0xFF,
+      byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF,
+      byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF)
   }
 }
 
