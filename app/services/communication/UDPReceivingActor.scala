@@ -7,13 +7,12 @@ import akka.io.Udp
 import akka.io.IO
 import akka.util.ByteString
 
-class UDPReceivingActor(persistenceActor: ActorRef) extends Actor{
+class UDPReceivingActor(persistenceActor: ActorRef, receivingAddress: InetSocketAddress) extends Actor {
   import context.system
-  val localAddress  = new InetSocketAddress("localhost", 1337)
-  IO(Udp) ! Udp.Bind(self, localAddress)
+  IO(Udp) ! Udp.Bind(self, receivingAddress)
 
   def receive = {
-    case Udp.Bound(localAddress) =>
+    case Udp.Bound(receivingAddress) =>
       context.become(ready(sender()))
   }
 
@@ -28,5 +27,6 @@ class UDPReceivingActor(persistenceActor: ActorRef) extends Actor{
 }
 
 object UDPReceivingActor {
-  def props(actorRef: ActorRef) = Props(new UDPReceivingActor(actorRef))
+  def props(actorRef: ActorRef, receivingAddress: InetSocketAddress) =
+    Props(new UDPReceivingActor(actorRef, receivingAddress))
 }

@@ -1,27 +1,12 @@
 package services.communication
 
-
 import java.nio.ByteBuffer
-
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import akka.actor.ActorSystem
-import akka.testkit.{ImplicitSender, TestKit, TestProbe}
+import akka.testkit.TestProbe
 import models.{GpsDataModel, MicrophoneDataModel, MicrophoneWithSlidersDataModel}
-import org.scalatest.mockito.MockitoSugar
 
-class DecodingActorSpec extends TestKit(ActorSystem("MySpec"))
-  with ImplicitSender
-  with WordSpecLike
-  with MockitoSugar
-  with Matchers
-  with BeforeAndAfterAll{
-
+class DecodingActorSpec extends BaseActorSpec {
   val prob1 = TestProbe()
   val decodingActor =  system.actorOf(DecodingActor.props(prob1.ref))
-
-  override def afterAll {
-    TestKit.shutdownActorSystem(system)
-  }
 
   "A Decoding Actor " should {
 

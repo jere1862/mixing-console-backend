@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import models.{AudioNode, NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel}
+import models.{AudioNode, NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel, NotifySoundLimitedModel}
 import play.api._
 import play.api.mvc._
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -37,14 +37,42 @@ class NodeController @Inject()(nodeService: NodeService, communicationService: C
     parseRequest(request, (notifyChangeModel: NotifyNodeSoundChangeModel) => {
       communicationService.notifyNodeSoundChange(notifyChangeModel)
     })
-    Ok
+    Ok.withHeaders(
+        ACCESS_CONTROL_ALLOW_ORIGIN -> "*",
+        ACCESS_CONTROL_ALLOW_HEADERS -> "*",
+        ACCESS_CONTROL_ALLOW_METHODS -> "PUT"
+    )
   }
 
   def notifyAutomaticAdjustment() = Action { implicit request: Request[AnyContent] =>
     parseRequest(request, (notifyAutomaticAdjustmentModel: NotifyAutomaticAdjustmentModel) => {
       communicationService.notifyAutomaticAdjustment(notifyAutomaticAdjustmentModel)
     })
-    Ok
+    Ok.withHeaders(
+      ACCESS_CONTROL_ALLOW_ORIGIN -> "*",
+      ACCESS_CONTROL_ALLOW_HEADERS -> "*",
+      ACCESS_CONTROL_ALLOW_METHODS -> "PUT"
+    )
+  }
+
+  def notifySoundLimited() = Action { implicit request: Request[AnyContent] =>
+    parseRequest(request, (notifySoundLimitedModel: NotifySoundLimitedModel) => {
+    communicationService.notifySoundLimited(notifySoundLimitedModel)
+  })
+    Ok.withHeaders(
+      ACCESS_CONTROL_ALLOW_ORIGIN -> "*",
+      ACCESS_CONTROL_ALLOW_HEADERS -> "*",
+      ACCESS_CONTROL_ALLOW_METHODS -> "PUT"
+    )
+  }
+
+  def reset() = Action { implicit request: Request[AnyContent] =>
+    nodeService.reset
+    Ok.withHeaders(
+      ACCESS_CONTROL_ALLOW_ORIGIN -> "*",
+      ACCESS_CONTROL_ALLOW_HEADERS -> "*",
+      ACCESS_CONTROL_ALLOW_METHODS -> "PUT"
+    )
   }
 
   def parseRequest[A](request: Request[AnyContent], callback: (A) => Unit )(implicit reqReads: Reads[A]): Unit ={

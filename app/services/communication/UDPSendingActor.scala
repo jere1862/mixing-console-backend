@@ -3,13 +3,12 @@ package services.communication
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Udp
 import akka.io.IO
 import akka.util.ByteString
 
-class UDPSendingActor extends Actor{
-  val remoteAddress: InetSocketAddress = new InetSocketAddress("localhost", 3000)
+class UDPSendingActor(remoteAddress: InetSocketAddress) extends Actor{
   import context.system
   IO(Udp) ! Udp.SimpleSender
 
@@ -22,4 +21,8 @@ class UDPSendingActor extends Actor{
     case msg: ByteBuffer =>
       send ! Udp.Send(ByteString.apply(msg.array), remoteAddress)
   }
+}
+
+object UDPSendingActor {
+  def props(inetSocketAddress: InetSocketAddress) = Props(new UDPSendingActor(inetSocketAddress))
 }

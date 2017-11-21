@@ -6,5 +6,6 @@ case class NotifyAutomaticAdjustmentModel(id: Int, adjustAutomatically: Boolean)
 }
 
 object NotifyAutomaticAdjustmentModel {
-  implicit val NotifyAutomaticAdjustmentModelReads = Json.reads[NotifyAutomaticAdjustmentModel]
+  implicit val notifyAutomaticAdjustmentModelReads = Json.reads[NotifyAutomaticAdjustmentModel]
+  implicit val notifyAutomaticAdjustmentModelWrites = Json.writes[NotifyAutomaticAdjustmentModel]
 }

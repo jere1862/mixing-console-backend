@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import akka.actor.{Actor, ActorRef, Props}
 import models.{DataModel, GpsDataModel, MicrophoneDataModel, MicrophoneWithSlidersDataModel}
+import play.api.Logger
 
 class DecodingActor(persistenceActor: ActorRef) extends Actor{
   val MicrophoneMessageLength = 6
@@ -16,19 +17,21 @@ class DecodingActor(persistenceActor: ActorRef) extends Actor{
   val HeaderMicrophoneWithSlidersData = 0x2
   val HeaderGpsData = 0x3
 
+  val logger = Logger(this.getClass)
+
   def receive = {
     case byteB: ByteBuffer =>
       try{
         val dataModel = decodeByteBuffer(byteB)
         dataModel match {
           case Some(data) => persistenceActor ! data
-          case None => println("Failed parsing message received by UDP.")
+          case None => logger.debug("Failed parsing message received by UDP.")
         }
       }catch {
         case e: Exception =>
           e.printStackTrace()
       }
-    case _ => println("Error parsing bytebuffer.")
+    case _ => logger.debug("Error parsing bytebuffer.")
   }
 
   def decodeByteBuffer(byteBuffer: ByteBuffer): Option[DataModel] = {
@@ -47,19 +50,19 @@ class DecodingActor(persistenceActor: ActorRef) extends Actor{
   }
 
   def parseGpsMessage(byteBuffer: ByteBuffer): GpsDataModel ={
-    println("Received gps message")
+    logger.debug("Received gps message")
     new GpsDataModel(byteBuffer.get, byteBuffer.getFloat, byteBuffer.getFloat)
   }
 
   def parseMicrophoneMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneDataModel = {
-    println("Received microphone data")
+    logger.debug("Received microphone data")
 
     new MicrophoneDataModel(byteBuffer.get & 0xFF, (flags & BitMaskFixFlag) == 1,
       byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF)
   }
 
   def parseMicrophoneWithSlidersMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneWithSlidersDataModel = {
-    println("Received microphone and sliders data")
+    logger.debug("Received microphone and sliders data")
 
     new MicrophoneWithSlidersDataModel(byteBuffer.get & 0xFF, (flags & 1) == 1, byteBuffer.get & 0xFF,
       byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF,

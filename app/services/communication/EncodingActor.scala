@@ -3,17 +3,20 @@ package services.communication
 import java.nio.ByteBuffer
 
 import akka.actor.{Actor, ActorRef, Props}
-import models.{NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel}
+import models.{NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel, NotifySoundLimitedModel}
 
 class EncodingActor(sendingActor: ActorRef) extends Actor {
-  val NotifyNodeSoundChangeMessageLength: Int = 3;
-  val NotifyAdjustAutomaticallyMessageLength: Int = 2;
+  val NotifyNodeSoundChangeMessageLength: Int = 3
+  val NotifyAdjustAutomaticallyMessageLength: Int = 2
+  val NotifySoundLimitedMessageLength: Int = 1
 
   def receive = {
     case notifyNode:NotifyNodeSoundChangeModel =>
       sendingActor ! encodeSoundChangeModel(notifyNode)
     case adjustAutomatically: NotifyAutomaticAdjustmentModel =>
       sendingActor ! encodeAdjustAutomaticallyModel(adjustAutomatically)
+    case notifySoundLimitedModel: NotifySoundLimitedModel =>
+      sendingActor ! encodeSoundLimitedModel(notifySoundLimitedModel)
     case _ =>
       println("UDPCommunicationService received wrong data type.")
   }
@@ -26,11 +29,17 @@ class EncodingActor(sendingActor: ActorRef) extends Actor {
   }
 
   def encodeAdjustAutomaticallyModel(adjustAutomatically: NotifyAutomaticAdjustmentModel) = {
-    val byteValue: Byte = if(adjustAutomatically.adjustAutomatically) 0x1 else 0x0
     val byteBuffer = ByteBuffer.allocate(NotifyAdjustAutomaticallyMessageLength)
     byteBuffer.put(adjustAutomatically.id.toByte)
-    byteBuffer.put(byteValue)
+    byteBuffer.put(booleanToByte(adjustAutomatically.adjustAutomatically))
   }
+
+  def encodeSoundLimitedModel(notifySoundLimitedModel: NotifySoundLimitedModel) = {
+    val byteBuffer = ByteBuffer.allocate(NotifySoundLimitedMessageLength)
+    byteBuffer.put(booleanToByte(notifySoundLimitedModel.isSoundLimited))
+  }
+
+  private def booleanToByte(input: Boolean): Byte = if(input) 0x1 else 0x0
 }
 
 object EncodingActor {

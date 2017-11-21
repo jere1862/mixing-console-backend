@@ -15,6 +15,12 @@ PUT     /api/nodes/change               controllers.NodeController.notifyChange
 # Notify automatic adjustment
 PUT     /api/nodes/automaticAdjustment  controllers.NodeController.notifyAutomaticAdjustment
 
+# Notify sound limiting
+PUT     /api/nodes/limitSound           controllers.NodeController.notifySoundLimited
+
+# Reset nodes (Debuggin call)
+DELETE     /api/nodes                   controllers.NodeController.reset
+
 # DEBUG CALL
 # Add or update node
 PUT     /api/nodes                      controllers.NodeController.addNode

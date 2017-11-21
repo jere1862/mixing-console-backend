@@ -8,4 +8,5 @@ trait NodeService {
   def list: Seq[AudioNode]
   def get(id: Int): Option[AudioNode]
   def save(audioNode: AudioNode): Unit
+  def reset(): Unit
 }
