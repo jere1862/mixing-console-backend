@@ -31,7 +31,7 @@ object AudioNode {
     dataModel match  {
       case gpsData: GpsDataModel => {
         new AudioNode(gpsData.id,
-                      "",
+                      gpsData.id.toString,
                       0,
                       0,
                       0,
@@ -50,7 +50,7 @@ object AudioNode {
       }
       case micData: MicrophoneDataModel => {
         new AudioNode(micData.id,
-                      "",
+                      micData.id.toString,
                       0,
                       0,
                       0,
@@ -69,7 +69,7 @@ object AudioNode {
       }
       case micData: MicrophoneWithSlidersDataModel => {
           new AudioNode(micData.id,
-                        "",
+                        micData.id.toString,
                         micData.volumeSlider,
                         micData.lowSlider,
                         micData.medSlider,
