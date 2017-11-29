@@ -13,6 +13,7 @@ libraryDependencies += "org.mockito" % "mockito-core" % "2.12.0" % Test
 libraryDependencies += "org.scalamock" %% "scalamock" % "4.0.0" % Test
 libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % Test
 libraryDependencies += ws
+libraryDependencies += filters
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "org.mutecc.controllers._"
