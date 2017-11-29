@@ -16,7 +16,7 @@ PUT     /api/nodes/change               controllers.NodeController.notifyChange
 PUT     /api/nodes/automaticAdjustment  controllers.NodeController.notifyAutomaticAdjustment
 
 # Notify sound limiting
-PUT     /api/nodes/limitSound           controllers.NodeController.notifySoundLimited
+PUT     /api/nodes/limitVolume           controllers.NodeController.notifySoundLimited
 
 # Reset nodes (Debugging call)
 DELETE     /api/nodes                   controllers.NodeController.reset
