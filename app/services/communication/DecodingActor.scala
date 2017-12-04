@@ -44,6 +44,9 @@ class DecodingActor(persistenceActor: ActorRef) extends Actor{
         Option.apply(parseGpsMessage(byteBuffer))
       case HeaderMicrophoneWithSlidersData =>
         Option.apply(parseMicrophoneWithSlidersMessage(byteBuffer, flags))
+      case _ =>
+        logger.debug(s"Received unkown header: $header, accepted values are $HeaderMicrophoneData, $HeaderMicrophoneWithSlidersData, or $HeaderGpsData.")
+        Option.empty
     }
   }
 

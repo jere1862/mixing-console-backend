@@ -1,8 +1,12 @@
 package services.communication
 
 import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit
+
 import akka.testkit.TestProbe
 import models.{GpsDataModel, MicrophoneDataModel, MicrophoneWithSlidersDataModel}
+
+import scala.concurrent.duration.FiniteDuration
 
 class DecodingActorSpec extends BaseActorSpec {
   val prob1 = TestProbe()
@@ -141,6 +145,16 @@ class DecodingActorSpec extends BaseActorSpec {
       micDataModel.low shouldBe 22
       micDataModel.med shouldBe 0
       micDataModel.high shouldBe 1
+    }
+
+    "throw an error if data has a wrong header" in {
+      val bytes:Array[Byte] = Array(
+        0xCD // HEADER
+      ).map(_.toByte)
+
+      decodingActor ! ByteBuffer.wrap(bytes)
+
+      prob1.expectNoMessage(FiniteDuration(2, TimeUnit.SECONDS))
     }
   }
 }
