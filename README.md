@@ -1,3 +1,4 @@
+![build status](https://travis-ci.org/jere1862/mixing-console-backend.svg?branch=add-udp)
 # Mixing console backend
 Backend for a sound mixing console web application
 
