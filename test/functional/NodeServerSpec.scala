@@ -121,7 +121,7 @@ class NodeServerSpec extends PlaySpec
     }
 
     "handle sound limiting" in {
-      val address = s"http://localhost:$port/api/nodes/limitSound"
+      val address = s"http://localhost:$port/api/nodes/limitVolume"
 
       val json = Json.toJsObject(NotifySoundLimitedModel(true))
 
@@ -161,10 +161,22 @@ object NodeServerSpec {
         Array(
           0x1, // HEADER
           id, // ID
+          0x00, // VOLUME
+          0x00, // VOLUME
           0x7F, // VOLUME
+          0xFF, // VOLUME
+          0x00, // LOW
+          0x00, // LOW
           0xFF, // LOW
+          0xAB, // LOW
           0x00, // MEDIUM
+          0x00, // MEDIUM
+          0x00, // MEDIUM
+          0x01, // MEDIUM
+          0x00, // HIGH
+          0x00, // HIGH
           0x01, // HIGH
+          0xFF, // HIGH
         )
       )
     }
@@ -195,10 +207,22 @@ object NodeServerSpec {
           0xFF, // LOWSLIDER
           0x00, // MEDSLIDER
           0x01, // HIGHSLIDER
+          0x00, // VOLUME
+          0x00, // VOLUME
           0x7F, // VOLUME
+          0xFF, // VOLUME
+          0x00, // LOW
+          0x00, // LOW
           0xFF, // LOW
+          0xAB, // LOW
           0x00, // MEDIUM
+          0x00, // MEDIUM
+          0x00, // MEDIUM
+          0x01, // MEDIUM
+          0x00, // HIGH
+          0x00, // HIGH
           0x01, // HIGH
+          0xFF, // HIGH
         )
       )
     }

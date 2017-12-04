@@ -7,8 +7,6 @@ import models.{DataModel, GpsDataModel, MicrophoneDataModel, MicrophoneWithSlide
 import play.api.Logger
 
 class DecodingActor(persistenceActor: ActorRef) extends Actor{
-  val MicrophoneMessageLength = 6
-  val GpsMessageLength = 9
   val BitMaskFixFlag = 0x1
   val headerMask = (1 << 4) - 1
   val flagsMask = headerMask << 4
@@ -57,17 +55,20 @@ class DecodingActor(persistenceActor: ActorRef) extends Actor{
   def parseMicrophoneMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneDataModel = {
     logger.debug("Received microphone data")
 
-    new MicrophoneDataModel(byteBuffer.get & 0xFF, (flags & BitMaskFixFlag) == 1,
-      byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF)
+    new MicrophoneDataModel(unsigned(byteBuffer.get), (flags & BitMaskFixFlag) == 1,
+      scaled(byteBuffer.getInt), scaled(byteBuffer.getInt), scaled(byteBuffer.getInt), scaled(byteBuffer.getInt))
   }
 
   def parseMicrophoneWithSlidersMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneWithSlidersDataModel = {
     logger.debug("Received microphone and sliders data")
 
-    new MicrophoneWithSlidersDataModel(byteBuffer.get & 0xFF, (flags & 1) == 1, byteBuffer.get & 0xFF,
-      byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF,
-      byteBuffer.get & 0xFF, byteBuffer.get & 0xFF, byteBuffer.get & 0xFF)
+    new MicrophoneWithSlidersDataModel(unsigned(byteBuffer.get), (flags & 1) == 1, unsigned(byteBuffer.get),
+      unsigned(byteBuffer.get), unsigned(byteBuffer.get), unsigned(byteBuffer.get), scaled(byteBuffer.getInt),
+      scaled(byteBuffer.getInt), scaled(byteBuffer.getInt), scaled(byteBuffer.getInt))
   }
+
+  private def unsigned(byte: Byte):Int = byte & 0xFF
+  private def scaled(int: Int) = Math.sqrt(int).toInt
 }
 
 object DecodingActor {

@@ -20,3 +20,5 @@ libraryDependencies += filters
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "org.mutecc.binders._"
+
+coverageExcludedPackages := """controllers\..*Reverse.*;router.Routes.*;"""

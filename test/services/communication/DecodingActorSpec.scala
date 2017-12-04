@@ -37,9 +37,21 @@ class DecodingActorSpec extends BaseActorSpec {
       val bytes:Array[Byte] = Array(
         0x1, // HEADER
         0x2, // ID
+        0x00, // VOLUME
+        0x00, // VOLUME
+        0xFF, // VOLUME
         0x7F, // VOLUME
+        0x00, // LOW
+        0x00, // LOW
+        0x01, // LOW
         0xFF, // LOW
         0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
         0x01, // HIGH
       ).map(_.toByte)
 
@@ -49,8 +61,8 @@ class DecodingActorSpec extends BaseActorSpec {
 
       micDataModel.id shouldBe 2
       micDataModel.isFix shouldBe false
-      micDataModel.volume shouldBe 127
-      micDataModel.low shouldBe 255
+      micDataModel.volume shouldBe 255
+      micDataModel.low shouldBe 22
       micDataModel.med shouldBe 0
       micDataModel.high shouldBe 1
     }
@@ -59,9 +71,21 @@ class DecodingActorSpec extends BaseActorSpec {
       val bytes:Array[Byte] = Array(
         0x11, // HEADER
         0x2, // ID
+        0x00, // VOLUME
+        0x00, // VOLUME
+        0xFF, // VOLUME
         0x7F, // VOLUME
+        0x00, // LOW
+        0x00, // LOW
+        0x01, // LOW
         0xFF, // LOW
         0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
         0x01, // HIGH
       ).map(_.toByte)
 
@@ -71,8 +95,8 @@ class DecodingActorSpec extends BaseActorSpec {
 
       micDataModel.id shouldBe 2
       micDataModel.isFix shouldBe true
-      micDataModel.volume shouldBe 0x7F
-      micDataModel.low shouldBe 0xFF
+      micDataModel.volume shouldBe 255
+      micDataModel.low shouldBe 22
       micDataModel.med shouldBe 0
       micDataModel.high shouldBe 1
     }
@@ -85,9 +109,21 @@ class DecodingActorSpec extends BaseActorSpec {
         0xFF, // LOWSLIDER
         0x00, // MEDSLIDER
         0x01, // HIGHSLIDER
+        0x00, // VOLUME
+        0x00, // VOLUME
+        0xFF, // VOLUME
         0x7F, // VOLUME
+        0x00, // LOW
+        0x00, // LOW
+        0x01, // LOW
         0xFF, // LOW
         0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // MEDIUM
+        0x00, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
         0x01, // HIGH
       ).map(_.toByte)
 
@@ -101,8 +137,8 @@ class DecodingActorSpec extends BaseActorSpec {
       micDataModel.lowSlider shouldBe 255
       micDataModel.medSlider shouldBe 0
       micDataModel.highSlider shouldBe 1
-      micDataModel.volume shouldBe 127
-      micDataModel.low shouldBe 255
+      micDataModel.volume shouldBe 255
+      micDataModel.low shouldBe 22
       micDataModel.med shouldBe 0
       micDataModel.high shouldBe 1
     }
