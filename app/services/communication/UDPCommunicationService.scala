@@ -6,6 +6,7 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import models.{NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel, NotifySoundLimitedModel}
 import com.typesafe.config.Config
+import play.api.Logger
 import services.node.NodeService
 
 class UDPCommunicationService @Inject()(nodeService: NodeService, configuration: Config) extends CommunicationService {
@@ -27,6 +28,11 @@ class UDPCommunicationService @Inject()(nodeService: NodeService, configuration:
    }
 
    def notifyAutomaticAdjustment(notifyAutomaticAdjustmentModel: NotifyAutomaticAdjustmentModel): Unit = {
+     val nodeOptional = nodeService.get(notifyAutomaticAdjustmentModel.id)
+     if(nodeOptional.nonEmpty && !notifyAutomaticAdjustmentModel.adjustAutomatically){
+       nodeService.save(nodeOptional.get.copy(isAdjustedAutomatically = false))
+     }
+
      encodingActor ! notifyAutomaticAdjustmentModel
    }
 

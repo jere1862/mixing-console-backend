@@ -5,7 +5,6 @@ import java.net.InetSocketAddress
 import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Udp
 import akka.io.IO
-import akka.util.ByteString
 import com.typesafe.config.Config
 
 class UDPReceivingActor(persistenceActor: ActorRef, receivingAddress: InetSocketAddress, configuration: Config, sendingActor: ActorRef) extends Actor {

@@ -4,7 +4,7 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.config.Config
-import models.{DataModel, GpsDataModel, MicrophoneDataModel, MicrophoneWithSlidersDataModel}
+import models._
 import play.api.Logger
 
 class DecodingActor(persistenceActor: ActorRef, configuration: Config) extends Actor{
@@ -13,8 +13,9 @@ class DecodingActor(persistenceActor: ActorRef, configuration: Config) extends A
   val flagsMask = headerMask << 4
 
   val HeaderMicrophoneData = 0x1
-  val HeaderMicrophoneWithSlidersData = 0x2
+  val MicrophoneGainData = 0x2
   val HeaderGpsData = 0x3
+  val MicrophoneVolumeData = 0x4
 
   val LowFactor = configuration.getInt("lowFactor")
   val MedFactor = configuration.getInt("medFactor")
@@ -46,10 +47,12 @@ class DecodingActor(persistenceActor: ActorRef, configuration: Config) extends A
         Option.apply(parseMicrophoneMessage(byteBuffer, flags))
       case HeaderGpsData =>
         Option.apply(parseGpsMessage(byteBuffer))
-      case HeaderMicrophoneWithSlidersData =>
-        Option.apply(parseMicrophoneWithSlidersMessage(byteBuffer, flags))
+      case MicrophoneGainData =>
+        Option.apply(parseMicrophoneGainData(byteBuffer, flags))
+      case MicrophoneVolumeData =>
+        Option.apply(parseMicrophoneVolumeData(byteBuffer, flags))
       case _ =>
-        Logger.debug(s"Received unknown header: $header, accepted values are $HeaderMicrophoneData, $HeaderMicrophoneWithSlidersData, or $HeaderGpsData.")
+        Logger.debug(s"Received unknown header: $header, accepted values are $HeaderMicrophoneData, $MicrophoneGainData, or $HeaderGpsData.")
         Option.empty
     }
   }
@@ -62,20 +65,25 @@ class DecodingActor(persistenceActor: ActorRef, configuration: Config) extends A
   def parseMicrophoneMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneDataModel = {
     Logger.debug("Received microphone data")
 
-    new MicrophoneDataModel(unsigned(byteBuffer.get), (flags & BitMaskFixFlag) == 1,
+    new MicrophoneDataModel(unsigned(byteBuffer.get), getFixBoolean(flags),
       byteBuffer.getInt, byteBuffer.getInt/LowFactor, byteBuffer.getInt/MedFactor, byteBuffer.getInt/HighFactor)
   }
 
-  def parseMicrophoneWithSlidersMessage(byteBuffer: ByteBuffer, flags: Byte): MicrophoneWithSlidersDataModel = {
-    Logger.debug("Received microphone and sliders data")
+  def parseMicrophoneGainData(byteBuffer: ByteBuffer, flags: Byte): MicrophoneGainDataModel = {
+    Logger.debug("Received microphone gain values")
 
-    new MicrophoneWithSlidersDataModel(unsigned(byteBuffer.get), (flags & 1) == 1, unsigned(byteBuffer.get),
-      unsigned(byteBuffer.get), unsigned(byteBuffer.get), unsigned(byteBuffer.get), byteBuffer.getInt,
-      byteBuffer.getInt/LowFactor, byteBuffer.getInt/MedFactor, byteBuffer.getInt/HighFactor)
+    new MicrophoneGainDataModel(unsigned(byteBuffer.get), getFixBoolean(flags), unsigned(byteBuffer.get),
+      unsigned(byteBuffer.get), unsigned(byteBuffer.get), unsigned(byteBuffer.get))
+  }
+
+  def parseMicrophoneVolumeData(byteBuffer: ByteBuffer, flags: Byte): MicrophoneVolumeDataModel = {
+    Logger.debug("Received microphone volume data")
+
+    new MicrophoneVolumeDataModel(unsigned(byteBuffer.get), getFixBoolean(flags), unsigned(byteBuffer.get))
   }
 
   private def unsigned(byte: Byte):Int = byte & 0xFF
-  private def scaled(value: Int) = value.toInt
+  private def getFixBoolean(flags: Byte): Boolean = (flags & BitMaskFixFlag) == 1
 }
 
 object DecodingActor {
