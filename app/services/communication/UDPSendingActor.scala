@@ -7,10 +7,12 @@ import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Udp
 import akka.io.IO
 import akka.util.ByteString
+import play.api.Logger
 
 class UDPSendingActor(remoteAddress: InetSocketAddress) extends Actor{
   import context.system
   IO(Udp) ! Udp.SimpleSender
+  var iNetAddress = remoteAddress
 
   def receive = {
     case Udp.SimpleSenderReady =>
@@ -19,7 +21,10 @@ class UDPSendingActor(remoteAddress: InetSocketAddress) extends Actor{
 
   def ready(send: ActorRef): Receive = {
     case msg: ByteBuffer =>
-      send ! Udp.Send(ByteString.apply(msg.array), remoteAddress)
+      Logger.debug(s"Sending actor relaying message to ${iNetAddress.toString}")
+      send ! Udp.Send(ByteString.apply(msg.array), iNetAddress)
+    case address: InetSocketAddress =>
+      iNetAddress = address
   }
 }
 

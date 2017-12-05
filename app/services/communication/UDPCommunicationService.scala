@@ -14,12 +14,12 @@ class UDPCommunicationService @Inject()(nodeService: NodeService, configuration:
   val receivingPort: Int = configuration.getInt("receiving.port")
 
   val destinationAddress = new InetSocketAddress(destinationHostname, destinationPort)
-  val receivingAddress = new InetSocketAddress("localhost", receivingPort)
+  val receivingAddress = new InetSocketAddress(receivingPort)
 
   val system = ActorSystem("UdpCommunicationSystem")
   val udpSender = system.actorOf(UDPSendingActor.props(destinationAddress), "UdpSender")
   val persistenceActor = system.actorOf(PersistenceActor.props(nodeService), "PersistenceActor")
-  val udpReceiver = system.actorOf(UDPReceivingActor.props(persistenceActor, receivingAddress), "UdpReceiver")
+  val udpReceiver = system.actorOf(UDPReceivingActor.props(persistenceActor, receivingAddress, configuration, udpSender), "UdpReceiver")
   val encodingActor = system.actorOf(EncodingActor.props(udpSender))
 
    def notifyNodeSoundChange(notifyNodeSoundChangeModel: NotifyNodeSoundChangeModel): Unit = {
