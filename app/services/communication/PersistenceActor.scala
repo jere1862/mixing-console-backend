@@ -10,7 +10,7 @@ class PersistenceActor(nodeService: NodeService) extends Actor{
     case data: DataModel =>
       val id = data.getId
       Logger.debug("Received a data model, converting it to a node.")
-      nodeService.get(data.getId) match {
+      nodeService.get(data.getId()) match {
         case Some(node) => {
           Logger.debug(s"Modifiying node $id.")
           val modifiedNode = createModifiedNode(node, data)
@@ -32,14 +32,13 @@ class PersistenceActor(nodeService: NodeService) extends Actor{
           longitude = gpsData.longitude, gpsDataSet = true)
       case micData: MicrophoneDataModel =>
         node.copy(volume = micData.volume, low = micData.low,
-          med = micData.med, high = micData.high, micDataSet = true,
-          isAdjustedAutomatically = false)
-      case micData: MicrophoneWithSlidersDataModel =>
-        node.copy(volumeSlider = micData.volumeSlider, lowSlider = micData.lowSlider,
-          medSlider = micData.medSlider, highSlider = micData.highSlider,
-          volume = micData.volume, low = micData.low,
-          med = micData.med, high = micData.high, micDataSet = true,
+          med = micData.med, high = micData.high, micDataSet = true)
+      case gainData: MicrophoneGainDataModel =>
+        node.copy(volumeSlider = gainData.volumeSlider, lowSlider = gainData.lowSlider,
+          medSlider = gainData.medSlider, highSlider = gainData.highSlider,
           isAdjustedAutomatically = true)
+      case volumeData: MicrophoneVolumeDataModel =>
+        node.copy(volumeSlider = volumeData.volumeSlider)
     }
   }
 }

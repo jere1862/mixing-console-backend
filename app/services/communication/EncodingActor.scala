@@ -1,6 +1,6 @@
 package services.communication
 
-import java.nio.ByteBuffer
+import java.nio.{ByteBuffer, ByteOrder}
 
 import akka.actor.{Actor, ActorRef, Props}
 import models.{NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel, NotifySoundLimitedModel}
@@ -23,6 +23,7 @@ class EncodingActor(sendingActor: ActorRef) extends Actor {
 
   def encodeSoundChangeModel(notifyNode: NotifyNodeSoundChangeModel) = {
     val byteBuffer = ByteBuffer.allocate(NotifyNodeSoundChangeMessageLength)
+    byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
     byteBuffer.put(notifyNode.id.toByte)
     byteBuffer.put(notifyNode.sliderType.toByte)
     byteBuffer.put(notifyNode.value.toByte)
@@ -30,12 +31,14 @@ class EncodingActor(sendingActor: ActorRef) extends Actor {
 
   def encodeAdjustAutomaticallyModel(adjustAutomatically: NotifyAutomaticAdjustmentModel) = {
     val byteBuffer = ByteBuffer.allocate(NotifyAdjustAutomaticallyMessageLength)
+    byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
     byteBuffer.put(adjustAutomatically.id.toByte)
     byteBuffer.put(booleanToByte(adjustAutomatically.adjustAutomatically))
   }
 
   def encodeSoundLimitedModel(notifySoundLimitedModel: NotifySoundLimitedModel) = {
     val byteBuffer = ByteBuffer.allocate(NotifySoundLimitedMessageLength)
+    byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
     byteBuffer.put(booleanToByte(notifySoundLimitedModel.isSoundLimited))
   }
 

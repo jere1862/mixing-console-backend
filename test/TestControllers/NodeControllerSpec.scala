@@ -1,18 +1,17 @@
-package controllers
+package TestControllers
 
+import controllers.NodeController
 import mocks.AudioNodeMocks
-import models.NotifyNodeSoundChangeModel
-import org.mockito.{ArgumentMatchers, Mockito}
-import org.scalatestplus.play._
-import org.scalatestplus.play.guice._
-import play.api.test._
-import play.api.test.Helpers._
-import services.communication.CommunicationService
-import services.node.NodeService
-import play.api.libs.json.JsArray
-import play.test.WithApplication
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play._
+import org.scalatestplus.play.guice._
+import play.api.libs.json.JsArray
+import play.api.test.Helpers._
+import play.api.test._
+import play.test.WithApplication
+import services.communication.CommunicationService
+import services.node.NodeService
 
 class NodeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting with MockitoSugar {
   "NodeContoller GET" must {

@@ -67,26 +67,6 @@ object AudioNode {
                       true,
                       false)
       }
-      case micData: MicrophoneWithSlidersDataModel => {
-          new AudioNode(micData.id,
-                        micData.id.toString,
-                        micData.volumeSlider,
-                        micData.lowSlider,
-                        micData.medSlider,
-                        micData.highSlider,
-                        micData.volume,
-                        micData.low,
-                        micData.med,
-                        micData.high,
-                        0.0f,
-                        0.0f,
-                        micData.isFix,
-                        1.0f,
-                        false,
-                        true,
-                        true)
-      }
-
     }
   }
 }

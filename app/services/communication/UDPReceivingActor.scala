@@ -5,9 +5,9 @@ import java.net.InetSocketAddress
 import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Udp
 import akka.io.IO
-import akka.util.ByteString
+import com.typesafe.config.Config
 
-class UDPReceivingActor(persistenceActor: ActorRef, receivingAddress: InetSocketAddress) extends Actor {
+class UDPReceivingActor(persistenceActor: ActorRef, receivingAddress: InetSocketAddress, configuration: Config, sendingActor: ActorRef) extends Actor {
   import context.system
   IO(Udp) ! Udp.Bind(self, receivingAddress)
 
@@ -18,15 +18,15 @@ class UDPReceivingActor(persistenceActor: ActorRef, receivingAddress: InetSocket
 
   def ready(socket: ActorRef): Receive = {
     case Udp.Received(data, remote) =>
-      val child = context.actorOf(DecodingActor.props(persistenceActor))
+      val child = context.actorOf(DecodingActor.props(persistenceActor, configuration))
       child ! data.asByteBuffer
-      socket ! Udp.Send(ByteString("Message received!"), remote) // Echo back
+      sendingActor ! remote
     case Udp.Unbind => socket ! Udp.Unbind
     case Udp.Unbound => context.stop(self)
   }
 }
 
 object UDPReceivingActor {
-  def props(actorRef: ActorRef, receivingAddress: InetSocketAddress) =
-    Props(new UDPReceivingActor(actorRef, receivingAddress))
+  def props(actorRef: ActorRef, receivingAddress: InetSocketAddress, configuration: Config, sendingActor: ActorRef) =
+    Props(new UDPReceivingActor(actorRef, receivingAddress, configuration, sendingActor))
 }

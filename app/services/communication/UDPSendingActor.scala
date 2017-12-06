@@ -11,6 +11,7 @@ import akka.util.ByteString
 class UDPSendingActor(remoteAddress: InetSocketAddress) extends Actor{
   import context.system
   IO(Udp) ! Udp.SimpleSender
+  var iNetAddress = remoteAddress
 
   def receive = {
     case Udp.SimpleSenderReady =>
@@ -19,7 +20,9 @@ class UDPSendingActor(remoteAddress: InetSocketAddress) extends Actor{
 
   def ready(send: ActorRef): Receive = {
     case msg: ByteBuffer =>
-      send ! Udp.Send(ByteString.apply(msg.array), remoteAddress)
+      send ! Udp.Send(ByteString.apply(msg.array), iNetAddress)
+    case address: InetSocketAddress =>
+      iNetAddress = address
   }
 }
 
