@@ -4,16 +4,24 @@ import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
 import akka.testkit.TestProbe
-import models.{GpsDataModel, MicrophoneDataModel, MicrophoneWithSlidersDataModel}
+import com.typesafe.config.Config
+import models.{GpsDataModel, MicrophoneDataModel, MicrophoneGainDataModel, MicrophoneWithSlidersDataModel}
+import org.mockito.Mockito
 
 import scala.concurrent.duration.FiniteDuration
 
 class DecodingActorSpec extends BaseActorSpec {
   val prob1 = TestProbe()
-  val decodingActor =  system.actorOf(DecodingActor.props(prob1.ref))
+  val prob2 = TestProbe()
+
+  val config = mock[Config]
+  Mockito.when(config.getInt("lowFactor")).thenReturn(1)
+  Mockito.when(config.getInt("medFactor")).thenReturn(1)
+  Mockito.when(config.getInt("highFactor")).thenReturn(1)
 
   "A Decoding Actor " should {
 
+  val decodingActor =  system.actorOf(DecodingActor.props(prob1.ref, config))
     "decode a gps message" in {
       val gpsMessage = ByteBuffer.wrap(Array(
         0x3, // HEADER
@@ -41,22 +49,22 @@ class DecodingActorSpec extends BaseActorSpec {
       val bytes:Array[Byte] = Array(
         0x1, // HEADER
         0x2, // ID
-        0x00, // VOLUME
-        0x00, // VOLUME
         0xFF, // VOLUME
-        0x7F, // VOLUME
-        0x00, // LOW
-        0x00, // LOW
-        0x01, // LOW
+        0x00, // VOLUME
+        0x00, // VOLUME
+        0x00, // VOLUME
         0xFF, // LOW
+        0x01, // LOW
+        0x00, // LOW
+        0x00, // LOW
         0x00, // MEDIUM
         0x00, // MEDIUM
         0x00, // MEDIUM
         0x00, // MEDIUM
-        0x00, // HIGH
-        0x00, // HIGH
-        0x00, // HIGH
         0x01, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
       ).map(_.toByte)
 
       decodingActor ! ByteBuffer.wrap(bytes)
@@ -66,7 +74,7 @@ class DecodingActorSpec extends BaseActorSpec {
       micDataModel.id shouldBe 2
       micDataModel.isFix shouldBe false
       micDataModel.volume shouldBe 255
-      micDataModel.low shouldBe 22
+      micDataModel.low shouldBe 511
       micDataModel.med shouldBe 0
       micDataModel.high shouldBe 1
     }
@@ -75,22 +83,22 @@ class DecodingActorSpec extends BaseActorSpec {
       val bytes:Array[Byte] = Array(
         0x11, // HEADER
         0x2, // ID
-        0x00, // VOLUME
-        0x00, // VOLUME
-        0xFF, // VOLUME
         0x7F, // VOLUME
-        0x00, // LOW
-        0x00, // LOW
-        0x01, // LOW
+        0x00, // VOLUME
+        0x00, // VOLUME
+        0x00, // VOLUME
         0xFF, // LOW
+        0x01, // LOW
+        0x00, // LOW
+        0x00, // LOW
         0x00, // MEDIUM
         0x00, // MEDIUM
         0x00, // MEDIUM
         0x00, // MEDIUM
-        0x00, // HIGH
-        0x00, // HIGH
-        0x00, // HIGH
         0x01, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
+        0x00, // HIGH
       ).map(_.toByte)
 
       decodingActor ! ByteBuffer.wrap(bytes)
@@ -99,8 +107,8 @@ class DecodingActorSpec extends BaseActorSpec {
 
       micDataModel.id shouldBe 2
       micDataModel.isFix shouldBe true
-      micDataModel.volume shouldBe 255
-      micDataModel.low shouldBe 22
+      micDataModel.volume shouldBe 127
+      micDataModel.low shouldBe 511
       micDataModel.med shouldBe 0
       micDataModel.high shouldBe 1
     }
@@ -113,27 +121,11 @@ class DecodingActorSpec extends BaseActorSpec {
         0xFF, // LOWSLIDER
         0x00, // MEDSLIDER
         0x01, // HIGHSLIDER
-        0x00, // VOLUME
-        0x00, // VOLUME
-        0xFF, // VOLUME
-        0x7F, // VOLUME
-        0x00, // LOW
-        0x00, // LOW
-        0x01, // LOW
-        0xFF, // LOW
-        0x00, // MEDIUM
-        0x00, // MEDIUM
-        0x00, // MEDIUM
-        0x00, // MEDIUM
-        0x00, // HIGH
-        0x00, // HIGH
-        0x00, // HIGH
-        0x01, // HIGH
       ).map(_.toByte)
 
       decodingActor ! ByteBuffer.wrap(bytes)
 
-      val micDataModel: MicrophoneWithSlidersDataModel = prob1.expectMsgClass(classOf[MicrophoneWithSlidersDataModel])
+      val micDataModel: MicrophoneGainDataModel = prob1.expectMsgClass(classOf[MicrophoneGainDataModel])
 
       micDataModel.id shouldBe 2
       micDataModel.isFix shouldBe false
@@ -141,10 +133,6 @@ class DecodingActorSpec extends BaseActorSpec {
       micDataModel.lowSlider shouldBe 255
       micDataModel.medSlider shouldBe 0
       micDataModel.highSlider shouldBe 1
-      micDataModel.volume shouldBe 255
-      micDataModel.low shouldBe 22
-      micDataModel.med shouldBe 0
-      micDataModel.high shouldBe 1
     }
 
     "throw an error if data has a wrong header" in {

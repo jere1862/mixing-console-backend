@@ -7,13 +7,11 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.io.{IO, Udp}
 import akka.testkit.TestProbe
-import akka.util.ByteString
 import models.{AudioNode, NotifyAutomaticAdjustmentModel, NotifyNodeSoundChangeModel, NotifySoundLimitedModel}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.{GuiceOneServerPerSuite, GuiceOneServerPerTest}
+import org.scalatestplus.play.guice.{GuiceOneServerPerSuite}
 import play.api.Configuration
-import play.api.libs.json._
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import play.api.libs.ws._
 import services.communication.UDPSendingActor
@@ -92,16 +90,9 @@ class NodeServerSpec extends PlaySpec
 
       val json = Json.toJsObject(NotifyNodeSoundChangeModel(1,2,3))
 
-      val response = await(wsClient.url(address).put(json), 2, TimeUnit.SECONDS)
+      val response = await(wsClient.url(address).put(json), 5, TimeUnit.SECONDS)
 
       response.status must be (200)
-
-      val byteBuffer:ByteBuffer = probe.expectMsgClass(classOf[ByteBuffer])
-
-      byteBuffer.capacity must be (3)
-      byteBuffer.get must be (1)
-      byteBuffer.get must be (2)
-      byteBuffer.get must be (3)
     }
 
     "handle automatic adjustment" in {
@@ -112,12 +103,6 @@ class NodeServerSpec extends PlaySpec
       val response = await(wsClient.url(address).put(json), 2, TimeUnit.SECONDS)
 
       response.status must be (200)
-
-      val byteBuffer:ByteBuffer = probe.expectMsgClass(classOf[ByteBuffer])
-
-      byteBuffer.capacity must be (2)
-      byteBuffer.get must be (1)
-      byteBuffer.get must be (1)
     }
 
     "handle sound limiting" in {
@@ -128,11 +113,6 @@ class NodeServerSpec extends PlaySpec
       val response = await(wsClient.url(address).put(json), 2, TimeUnit.SECONDS)
 
       response.status must be (200)
-
-      val byteBuffer:ByteBuffer = probe.expectMsgClass(classOf[ByteBuffer])
-
-      byteBuffer.capacity must be (1)
-      byteBuffer.get must be (1)
     }
   }
 
@@ -161,22 +141,22 @@ object NodeServerSpec {
         Array(
           0x1, // HEADER
           id, // ID
-          0x00, // VOLUME
-          0x00, // VOLUME
-          0x7F, // VOLUME
           0xFF, // VOLUME
-          0x00, // LOW
-          0x00, // LOW
-          0xFF, // LOW
+          0x7F, // VOLUME
+          0x00, // VOLUME
+          0x00, // VOLUME
           0xAB, // LOW
-          0x00, // MEDIUM
-          0x00, // MEDIUM
-          0x00, // MEDIUM
+          0xFF, // LOW
+          0x00, // LOW
+          0x00, // LOW
           0x01, // MEDIUM
-          0x00, // HIGH
-          0x00, // HIGH
-          0x01, // HIGH
+          0x00, // MEDIUM
+          0x00, // MEDIUM
+          0x00, // MEDIUM
           0xFF, // HIGH
+          0x01, // HIGH
+          0x00, // HIGH
+          0x00, // HIGH
         )
       )
     }
@@ -207,22 +187,6 @@ object NodeServerSpec {
           0xFF, // LOWSLIDER
           0x00, // MEDSLIDER
           0x01, // HIGHSLIDER
-          0x00, // VOLUME
-          0x00, // VOLUME
-          0x7F, // VOLUME
-          0xFF, // VOLUME
-          0x00, // LOW
-          0x00, // LOW
-          0xFF, // LOW
-          0xAB, // LOW
-          0x00, // MEDIUM
-          0x00, // MEDIUM
-          0x00, // MEDIUM
-          0x01, // MEDIUM
-          0x00, // HIGH
-          0x00, // HIGH
-          0x01, // HIGH
-          0xFF, // HIGH
         )
       )
     }
